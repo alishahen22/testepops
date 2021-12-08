@@ -23,9 +23,9 @@ class TagController extends Controller
     public function create()
     {
         $admin = Auth::user();
-       $newspapers = Newspaper::select('id', 'title')->get();
+    //   $newspapers = Newspaper::select('id', 'title')->get();
 
-        return view('admin.tags.addtag', compact('admin','newspapers'));
+        return view('admin.tags.addtag', compact('admin'));
     }
 
 
@@ -40,9 +40,9 @@ class TagController extends Controller
                 'name' => $request->name ,
 
             ]);
-            $Tag_id = Tag::where('name',$request->name)->first()->id;
-            $Tag = Tag::find($Tag_id);
-            $Tag->newspaper()->attach($request->servicesIds);
+//            $Tag_id = Tag::where('name',$request->name)->first()->id;
+//            $Tag = Tag::find($Tag_id);
+//            $Tag->newspaper()->attach($request->servicesIds);
 
             return redirect()->back()->with('msg','Tag added successfully');
     }

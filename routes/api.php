@@ -22,26 +22,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum','verified')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 
-
-// add user ( register )
-Route::post('addUser','UserController@addUser');
-
-// add tag
-Route::post('addTag','admin\DashboardController@addTag');
-
 // get all Categories ( true ) from tag
 Route::get('getCategories','NewsController@getCategories');
-
-// add newspaper
-Route::post('addNewsPaper','admin\DashboardController@addNewsPaper');
-
-// add newspaper
-Route::post('addArticle','admin\DashboardController@addArticle');
 
 // get all articles that belongs to specific tag
 Route::post('getArticlesTag','NewsController@getArticlesTag');
@@ -49,23 +36,11 @@ Route::post('getArticlesTag','NewsController@getArticlesTag');
 // get all articles that belongs to specific newspaper
 Route::post('getArticlesNews','NewsController@getArticlesNews');
 
-// add like
-Route::post('addLike','UserController@addLike');
-
 // get count of likes for every article
 Route::get('countLikes','NewsController@countLikes');
 
-// add follow
-Route::post('addFollow','UserController@addFollow');
-
 // get count of likes for every article
 Route::get('countFollows','NewsController@countFollows');
-
-// add article to saved
-Route::post('addToSaved','UserController@addToSaved');
-
-// get all saved for user
-Route::post('getAllSaved','UserController@getAllSaved');
 
 // get all articles in random ( home )
 Route::get('getAllArticles','NewsController@getAllArticles');
@@ -79,17 +54,24 @@ Route::group([
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
 
-    Route::post('email/verification-notification', [VerificationController::class, 'sendVerificationEmail']);
-    Route::get('verify-email/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+//    Route::post('email/verification-notification', [VerificationController::class, 'sendVerificationEmail']);
+//    Route::get('verify-email/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
     Route::get('/verifyuser','VerificationController@verifyuser');
     Route::post('/getcodeemail','VerificationController@getcodeemail');
 
     Route::put('/updateprofile', [UserController::class, 'updateprofile']);
     Route::put('/updatepassword', [UserController::class, 'updatepassword']);
+
+    Route::post('addLike','UserController@addLike');
+    Route::post('addFollow','UserController@addFollow');
+
+    Route::post('addToSaved','UserController@addToSaved');
+    Route::post('getAllSaved','UserController@getAllSaved');
+
     Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/refresh', [UserController::class, 'refresh']);
-    Route::get('test', [UserController::class, 'test']);
+//    Route::get('test', [UserController::class, 'test']);
 
 });
 
@@ -105,3 +87,5 @@ Route::post('forgot-password', [VerificationController::class, 'forgotPassword']
 Route::post('getcodepassword', [VerificationController::class, 'getcodepassword']);
 Route::post('reset-password', [VerificationController::class, 'reset']);
 
+//returen all tags
+//media == null

@@ -40,6 +40,7 @@ class NewsPapersController extends Controller
         'title' => 'required',
 
     ]);
+
         $file = $request->file('logo');
         $extenstion = $file->getClientOriginalExtension();
         $filename = time().'.'.$extenstion;

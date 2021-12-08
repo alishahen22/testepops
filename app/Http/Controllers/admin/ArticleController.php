@@ -40,15 +40,16 @@ class ArticleController extends Controller
         'conclusion' => 'required',
         'title' => 'required',
         'newspaper'=>'required',
-        'servicesIds'=>'required'
+        'servicesIds'=>'required',
+        'media'=>'required'
+
     ]);
-        if($request->file('media')){
         $file = $request->file('media');
         $extenstion = $file->getClientOriginalExtension();
         $filename = time().'.'.$extenstion;
         $file->move('uploads/media/', $filename);
-     }
-     $filename =null;
+
+     //$filename =null;
         Article::create(
             [
                 'author' => $request->author ,

@@ -33,16 +33,16 @@
 
 
 
-            <div class="form-group">
-                <label for="exampleInputEmail1">select newspaper </label>
+{{--            <div class="form-group">--}}
+{{--                <label for="exampleInputEmail1">select newspaper </label>--}}
 
-                <select class="form-control" name="servicesIds[]" multiple>
-                    @foreach($newspapers as $newspaper)
-                    <option value="{{$newspaper -> id}}">{{$newspaper -> title}}</option>
-                @endforeach
-                </select>
+{{--                <select class="form-control" name="servicesIds[]" multiple>--}}
+{{--                    @foreach($newspapers as $newspaper)--}}
+{{--                    <option value="{{$newspaper -> id}}">{{$newspaper -> title}}</option>--}}
+{{--                @endforeach--}}
+{{--                </select>--}}
 
-            </div>
+{{--            </div>--}}
             <button type="submit" class="btn btn-primary">{{__('Add Article')}}</button>
         </form>
             <!-- /.row -->

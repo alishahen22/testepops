@@ -41,8 +41,8 @@
                             <td> {{ $loop->index+1 }}</td>
                             <td> {{ $article->author }}</td>
                         <td> {{ $article->conclusion }}</td>
-                        <td> {{ $article->title}}</td>
-                        <td> {{  $article->newspaper->title}}</td>
+                            <td> {{ $article->title}}</td>
+                        <td> {{  $article->newspaper[0]->title}}</td>
                         {{-- <td><img  src="{{asset('uploads/media/'.$article->media)}}" class="img-circle d-block " width = "80px" height ="80px" alt="no media"> --}}
 
                         </td>

@@ -24,47 +24,18 @@ class VerificationController extends Controller
 {
    use GeneralTrait ;
 
-    public function sendVerificationEmail(Request $request)
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return [
-                'message' => 'Already Verified'
-            ];
-        }
-
-        $request->user()->sendEmailVerificationNotification();
-
-        return ['status' => 'verification-link-sent'];
-    }
-
-
-
-    public function verify(EmailVerificationRequest $request)
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return [
-                'message' => 'Email already verified'
-            ];
-        }
-
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
-
-        return [
-            'message'=>'Email has been verified'
-        ];
-    }
-
-
 
     // send email to user for verification
     public function verifyuser(Request $request)
     {
         $user= Auth('api')->user();
-        if($user->email){
+        if($user && $user->email_verified_at == null){
             Mail::to($user->email)->send(new VerifyMail());
             return $this->returnSuccessMessage('Email sent successfully','201') ;
+        }
+        else
+        {
+            return $this->returnError('404','invalid user or verified before');
         }
     }
 
@@ -74,7 +45,7 @@ class VerificationController extends Controller
     {
 
         $user= Auth('api')->user();
-        if($user->code == $request->code)
+        if($user && $user->code == $request->code)
         {
             $user->email_verified_at = Carbon::now();
             $user->code = null ;
@@ -88,52 +59,48 @@ class VerificationController extends Controller
     }
 
 
-
+    // send email for user when forget password
     public function forgotPassword(Request $request)
     {
         $user = User::where('email',$request->email)->first();
         if($user){
             Mail::to($user->email)->send(new VerifyPassword());
-            return $this->returnData('Email',$user->email,'Email sent successfully','201') ;
-        }
-    }
-
-
-    // get code from user to verify his email
-    public function getcodepassword(Request $request)
-    {
-        $user = User::where('email',$request->email)->first();
-
-        if($user->code == $request->code)
-        {
-            $user->email_verified_at = Carbon::now();
-            $user->code = null ;
-            $user->save() ;
-            return $this->returnSuccessMessage('Verification Done','201') ;
+            return $this->returnData('email',$user->email,'Email sent successfully','201') ;
         }
         else
         {
-            return $this->returnError('404','Incorrect Code, Try Again') ;
+            return $this->returnError('404','failed to find email');
         }
-
 
     }
 
 
-
+    // reset new password
     public function reset(Request $request)
     {
 
-        $user = User::where('email',$request->email)->first();
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:6',
+        ]);
 
-        if ($request->password == $request->password_confirmation)
-        {
-            $user->password = Hash::make($request->password);
-            $user->save();
-            return 'password reset successfully' ;
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
         }
-        return 'failed';
 
+        $user = User::where('code',$request->code)->first();
+        if ($user) {
+            if ($request->password == $request->password_confirmation) {
+                $user->password = Hash::make($request->password);
+                $user->code = null;
+                $user->save();
+                return $this->returnSuccessMessage('password reset successfully', '201');
+            } else {
+                return $this->returnError('404', "password don't match");
+            }
+        }else{
+            return $this->returnError('404', 'the code incorrect');
+
+        }
     }
 
 
@@ -165,6 +132,37 @@ class VerificationController extends Controller
 
 
 
+    //    public function sendVerificationEmail(Request $request)
+//    {
+//        if ($request->user()->hasVerifiedEmail()) {
+//            return [
+//                'message' => 'Already Verified'
+//            ];
+//        }
+//
+//        $request->user()->sendEmailVerificationNotification();
+//
+//        return ['status' => 'verification-link-sent'];
+//    }
+//
+//
+//
+//    public function verify(EmailVerificationRequest $request)
+//    {
+//        if ($request->user()->hasVerifiedEmail()) {
+//            return [
+//                'message' => 'Email already verified'
+//            ];
+//        }
+//
+//        if ($request->user()->markEmailAsVerified()) {
+//            event(new Verified($request->user()));
+//        }
+//
+//        return [
+//            'message'=>'Email has been verified'
+//        ];
+//    }
 
 
 

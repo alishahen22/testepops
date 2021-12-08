@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNewspaperTagesTable extends Migration
+class CreateNewspaperTagTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateNewspaperTagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('newspaper_tages', function (Blueprint $table) {
+        Schema::create('newspaper_tag', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tag_id');
             $table->foreign('tag_id')->references('id')->on('tags');
@@ -30,6 +30,6 @@ class CreateNewspaperTagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('newspaper_tages');
+        Schema::dropIfExists('newspaper_tag');
     }
 }

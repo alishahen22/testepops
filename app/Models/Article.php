@@ -11,13 +11,16 @@ class Article extends Model
 
     protected $fillable =
         [
-          'author' , 'conclusion' , 'link' , 'media' , 'title' , 'publish_date' , 'updated_date' ,'newspaper_id' , 'tag_id'
+          'author' , 'conclusion' , 'link' , 'media' , 'title' , 'publish_date' , 'updated_date' ,'newspaper_id'
         ];
 
 
     protected $hidden = [
-      'created_at' , 'updated_at' ,'tag_id' ,'newspaper_id'
+      'created_at' , 'updated_at' ,'newspaper_id'
     ];
+
+
+
 
 
     public function newspaper()
@@ -41,5 +44,18 @@ class Article extends Model
     }
 
 
+
+    protected $appends = ['newspaper'];
+
+
+    public function getNewspaperAttribute(){
+        if ($this->newspaper_id){
+
+
+        $newspaper_title =Newspaper::select('title','logo')->whereId($this->newspaper_id)->get();
+        return $newspaper_title;
+
+        }
+    }
 
 }

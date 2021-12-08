@@ -28,70 +28,7 @@ class UserController extends Controller
     use GeneralTrait ;
 
 
-    // add like to article
-    public function addLike(Request $request)
-    {
-
-        if ( User::find($request->input('user_id')) && Article::find($request->input('article_id')))
-        {
-            Like::create([
-                'user_id'  => $request->input('user_id'),
-                'article_id'  => $request->input('article_id'),
-            ]);
-            return $this->returnSuccessMessage('like saved successfully','201');
-        }
-
-         return $this->returnError('404','input valid') ;
-    }
-
-
-    // add follow to newspaper
-    public function addFollow(Request $request)
-    {
-        if ( User::find($request->input('user_id')) && Newspaper::find($request->input('newspaper_id')))
-        {
-            Follow::create([
-                'user_id'  => $request->input('user_id'),
-                'newspaper_id'  => $request->input('newspaper_id'),
-            ]);
-            return $this->returnSuccessMessage('follow saved successfully','201');
-        }
-
-        return $this->returnError('404','input valid') ;
-    }
-
-
-    // add article to saved
-    public function addToSaved(Request $request)
-    {
-
-        if ( User::find($request->input('user_id')) && Article::find($request->input('article_id')))
-        {
-            $user = User::findOrFail($request->user_id);
-            $user->article()->attach($request->article_id);
-            return $this->returnSuccessMessage('article saved successfully','201');
-        }
-
-        return $this->returnError('404','input valid') ;
-    }
-
-
-    // get all saved for specific user
-    public function getAllSaved(Request $request)
-    {
-        if ( User::find($request->input('user_id')) &&  User::findOrFail($request->input('user_id'))->article->count()>0)
-        {
-            $articles = User::findOrFail($request->input('user_id'))->article ;
-            return $this->returnData('saved',$articles,'There are all saved','201');
-        }
-        return $this->returnError('404','No articles') ;
-    }
-
-
-
-
-
-
+   // user registeration
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|between:2,100',
@@ -109,15 +46,11 @@ class UserController extends Controller
             ['password' => bcrypt($request->password)]
         ));
 
-        return response()->json([
-            'message' => 'User successfully registered',
-            'user' => $user
-        ], 201);
+        return $this->returnSuccessMessage('201','user registered successfully');
     }
 
 
-
-
+    // user login
     public function login(Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -137,12 +70,8 @@ class UserController extends Controller
 
 
     protected function createNewToken($token){
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => auth()->user()
-        ]);
+        return $this->returnData('token',$token,'user loggined successfully','201');
+
     }
 
 
@@ -151,39 +80,50 @@ class UserController extends Controller
     }
 
 
-
+    // update user profile ( name , email )
     public function updateprofile(Request $request)
     {
-        //validation
-        $user  = User::find(Auth::id());
+
+        $user  = Auth('api')->user();
         if($user->email !=$request->email){
-            $validator = Validator::make($request->all(), ['email' => 'required|string|email|max:100|unique:users']);
+            $validator = Validator::make($request->all(), ['email' => 'required|string|email|max:30|unique:users']);
             if($validator->fails()){
                 return response()->json($validator->errors()->toJson(), 400);
             }
         }
+
+        //validation
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|between:2,100',
-            'last_name' => 'required|string|between:2,100',
+            'first_name' => 'required|string|between:2,20',
+            'last_name' => 'required|string|between:2,20',
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors()->toJson(), 400);
         }
-        //update
+
+        // edit info
         if ($user)
+        {
             $user->first_name = $request->first_name ;
             $user->last_name = $request->last_name ;
             $user->email = $request->email ;
             $user->save();
 
-            return 'done';
+            return $this->returnSuccessMessage('user edit info successfully','201');
+        }
+        else
+        {
+            return $this->returnError('404','failed to update');
+        }
+
     }
 
 
+    // update user password
     public function updatepassword(Request $request)
     {
-
+        // validation
         $validator = Validator::make($request->all(), [
             'newPassword' => 'required|min:8',
             'oldPassword' => 'required|min:8',
@@ -193,102 +133,162 @@ class UserController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $user  = User::find(Auth::id());
-        if ( Hash::check($request->oldPassword, $user->password)) {
+        $user  = Auth('api')->user();;
+        if (Hash::check($request->oldPassword, $user->password)) {
             $user->password =Hash::make($request->newPassword);
             $user->save();
-            return "updated";
+            return $this->returnSuccessMessage('password updated successfully','201');
         }
-        else{
-            return 'failed';
+        else
+            {
+            return $this->returnError('404','failed to update');
         }
 
     }
 
 
-
-    public function forgotPassword(Request $request)
+    // add like to article
+    public function addLike(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
 
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-
-        if ($status == Password::RESET_LINK_SENT) {
-            return [
-                'status' => __($status)
-            ];
-        }
-
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
-
-    }
-
-
-
-    public function reset(Request $request)
-    {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => ['required', 'confirmed', RulesPassword::defaults()],
-        ]);
-
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-
-                ])->save();
-
-                $user->tokens()->delete();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        if ($status == Password::PASSWORD_RESET) {
-            return response([
-                'message'=> 'Password reset successfully'
+        if ( User::find($request->input('user_id')) && Article::find($request->input('article_id')))
+        {
+            Like::firstOrCreate([
+                'user_id'  => $request->input('user_id'),
+                'article_id'  => $request->input('article_id'),
             ]);
+            return $this->returnSuccessMessage('like saved successfully','201');
         }
 
-        return response([
-            'message'=> __($status)
-        ], 500);
-
+        return $this->returnError('404','input valid') ;
     }
 
 
+    // add follow to newspaper
+    public function addFollow(Request $request)
+    {
+        if ( User::find($request->input('user_id')) && Newspaper::find($request->input('newspaper_id')))
+        {
+            Follow::firstOrCreate([
+                'user_id'  => $request->input('user_id'),
+                'newspaper_id'  => $request->input('newspaper_id'),
+            ]);
+            return $this->returnSuccessMessage('follow saved successfully','201');
+        }
+
+        return $this->returnError('404','input valid') ;
+    }
 
 
-//public function reset($token)
-//{
-//    return $token;
-//}
+    // add article to saved
+    public function addToSaved(Request $request)
+    {
+
+        if ( User::find($request->input('user_id')) && Article::find($request->input('article_id')))
+        {
+            $user = User::findOrFail($request->user_id);
+            $user->article()->syncWithoutDetaching($request->article_id);
+            return $this->returnSuccessMessage('article saved successfully','201');
+        }
+
+        return $this->returnError('404','input valid') ;
+    }
 
 
+    // get all saved for specific user
+    public function getAllSaved(Request $request)
+    {
+        if ( User::find($request->input('user_id')) &&  User::findOrFail($request->input('user_id'))->article->count()>0)
+        {
+            $articles = User::findOrFail($request->input('user_id'))->article ;
+            return $this->returnData('saved',$articles,'There are all saved','201');
+        }
+        return $this->returnError('404','No articles') ;
+    }
+
+
+    // user logout
     public function logout() {
         auth()->logout();
-
         return response()->json(['message' => 'User successfully signed out']);
     }
 
 
-
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['login', 'register','forgotPassword','reset']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
         auth()->setDefaultDriver('api');
     }
+
+
+
+
+
+//    public function forgotPassword(Request $request)
+//    {
+//        $request->validate([
+//            'email' => 'required|email',
+//        ]);
+//
+//
+//        $status = Password::sendResetLink(
+//            $request->only('email')
+//        );
+//
+//
+//        if ($status == Password::RESET_LINK_SENT) {
+//            return [
+//                'status' => __($status)
+//            ];
+//        }
+//
+//        throw ValidationException::withMessages([
+//            'email' => [trans($status)],
+//        ]);
+//
+//    }
+//
+//
+//
+//    public function reset(Request $request)
+//    {
+//        $request->validate([
+//            'token' => 'required',
+//            'email' => 'required|email',
+//            'password' => ['required', 'confirmed', RulesPassword::defaults()],
+//        ]);
+//
+//        $status = Password::reset(
+//            $request->only('email', 'password', 'password_confirmation', 'token'),
+//            function ($user) use ($request) {
+//                $user->forceFill([
+//                    'password' => Hash::make($request->password),
+//                    'remember_token' => Str::random(60),
+//
+//                ])->save();
+//
+//                $user->tokens()->delete();
+//
+//                event(new PasswordReset($user));
+//            }
+//        );
+//
+//        if ($status == Password::PASSWORD_RESET) {
+//            return response([
+//                'message'=> 'Password reset successfully'
+//            ]);
+//        }
+//
+//        return response([
+//            'message'=> __($status)
+//        ], 500);
+//
+//    }
+
+
+
+
+
+
 
 
 }
