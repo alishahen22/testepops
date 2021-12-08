@@ -49,7 +49,6 @@ Route::prefix('admin')->middleware('auth')->group(function ()
 
 });
 
-<<<<<<< HEAD
 Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
 
 
@@ -63,8 +62,6 @@ Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
 // newspaper i will add select contain tags  Done
 // media in atricle should be null           Done
 
-=======
 //Route::get('reset-password/{token}', [UserController::class, 'reset']);
 
 Route::get('/verifyemail/{code}',[\App\Http\Controllers\VerificationController::class,'hi'])->name('hi');
->>>>>>> ed78d2a6ddaee3aa39a8658f62f7e9068576f63d

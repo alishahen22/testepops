@@ -1,15 +1,12 @@
 <?php
 
-<<<<<<< HEAD
+
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
 use Illuminate\Auth\Notifications\ResetPassword;
-=======
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Mail\VerifyMail;
->>>>>>> ed78d2a6ddaee3aa39a8658f62f7e9068576f63d
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -95,10 +92,10 @@ Route::group([
     Route::get('test', [UserController::class, 'test']);
 
 });
-<<<<<<< HEAD
-Route::post('password/email', 'ForgotPasswordController@forgot');
-Route::post('password/reset', 'ForgotPasswordController@reset');
-=======
+
+//Route::post('password/email', 'ForgotPasswordController@forgot');
+//Route::post('password/reset', 'ForgotPasswordController@reset');
+
 // verify , active,non active
 
 //Route::post('forgot-password', [UserController::class, 'forgotPassword']);
@@ -107,4 +104,4 @@ Route::post('password/reset', 'ForgotPasswordController@reset');
 Route::post('forgot-password', [VerificationController::class, 'forgotPassword']);
 Route::post('getcodepassword', [VerificationController::class, 'getcodepassword']);
 Route::post('reset-password', [VerificationController::class, 'reset']);
->>>>>>> ed78d2a6ddaee3aa39a8658f62f7e9068576f63d
+

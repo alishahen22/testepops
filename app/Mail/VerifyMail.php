@@ -30,7 +30,7 @@ class VerifyMail extends Mailable
     public function build()
     {
         $code = rand(1000 ,9999);
-        $user = Auth::user() ;
+        $user = Auth('api')->user() ;
         $user->code = $code ;
         $user->save();
         return $this->markdown('emails.verify')->with('code',$code);

@@ -12,16 +12,16 @@ return [
     | as required, but they're a perfect start for most applications.
     |
     */
+//dgsdf
+    'defaults' => [
+        'guard' => 'web',
+        'passwords' => 'users', //admin
+    ],
 
-   'defaults' => [
-       'guard' => 'web',
-       'passwords' => 'admins',
-   ],
-
-    // 'defaults' => [
-    //     'guard' => 'api',
-    //     'passwords' => 'users',
-    // ],
+//    'defaults' => [
+//        'guard' => 'api',
+//        'passwords' => 'users',
+//    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -44,6 +44,8 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'admins',
+
+
         ],
 
         'api' => [
@@ -51,6 +53,7 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
     ],
 
     /*

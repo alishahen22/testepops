@@ -286,11 +286,7 @@ class UserController extends Controller
 
 
     public function __construct() {
-<<<<<<< HEAD
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
-=======
         $this->middleware('auth:api', ['except' => ['login', 'register','forgotPassword','reset']]);
->>>>>>> ed78d2a6ddaee3aa39a8658f62f7e9068576f63d
         auth()->setDefaultDriver('api');
     }
 
